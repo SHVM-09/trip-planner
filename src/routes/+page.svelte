@@ -8,6 +8,7 @@
 	let input = $state('');
 	let response = $state('');
 	let loading = $state(false);
+	let errorMsg = $state('');
 
 	let userCoords = $state<{ lat: number; lon: number } | null>(null);
 	let showMap = $state(false);
@@ -50,6 +51,11 @@
 			headers: { 'Content-Type': 'application/json' }
 		});
 		const data = await res.json();
+		if (!res.ok) {
+			errorMsg = data.error || 'Failed to generate plan';
+			loading = false;
+			return;
+		}
 		response = typeof data.output === 'string' ? data.output : JSON.stringify(data.output);
 		if (data.destinationCoords) {
 			toCoords = [data.destinationCoords.lat, data.destinationCoords.lon];
@@ -141,8 +147,23 @@
 				<div class="max-w-4xl mx-auto mt-6 bg-zinc-900 p-6 rounded-xl shadow-lg prose prose-invert prose-headings:text-blue-400">
 					{@html renderMarkdown(response)}
 				</div>
-			{:else}
+			{:else if errorMsg}
 				<p class="text-center mt-10 text-red-400">Unable to generate plan. Please try again.</p>
+			{/if}
+
+			{#if selectedTrip}
+				<div class="mt-10">
+					<h2 class="text-xl font-semibold mb-4">Past Trip Details</h2>
+					<div class="bg-zinc-900 p-6 rounded-xl shadow-lg prose prose-invert">
+						<p><strong>Input:</strong> {selectedTrip.input}</p>
+						<p><strong>Result:</strong> {@html renderMarkdown(selectedTrip.result)}</p>
+						{#if selectedTrip.destination_lat && selectedTrip.destination_lon}
+							<p><strong>Destination Coordinates:</strong> {selectedTrip.destination_lat}, {selectedTrip.destination_lon}</p>
+						{/if}
+					</div>
+				</div>
+			{:else}
+				<p class="text-center mt-10 text-zinc-500 text-sm">Select a past trip from the sidebar to view details.</p>
 			{/if}
 		</main>
 	</div>
