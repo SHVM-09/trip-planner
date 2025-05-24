@@ -149,9 +149,11 @@
 				</div>
 			{:else if errorMsg}
 				<p class="text-center mt-10 text-red-400">Unable to generate plan. Please try again.</p>
+			{:else}
+				<p class="text-center mt-10 text-zinc-500 text-sm">Select a past trip from the sidebar to view details.</p>
 			{/if}
 
-			{#if selectedTrip}
+			{#if selectedTrip && !response}
 				<div class="mt-10">
 					<h2 class="text-xl font-semibold mb-4">Past Trip Details</h2>
 					<div class="bg-zinc-900 p-6 rounded-xl shadow-lg prose prose-invert">
@@ -162,8 +164,6 @@
 						{/if}
 					</div>
 				</div>
-			{:else}
-				<p class="text-center mt-10 text-zinc-500 text-sm">Select a past trip from the sidebar to view details.</p>
 			{/if}
 		</main>
 	</div>
